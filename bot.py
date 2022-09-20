@@ -1,7 +1,7 @@
-import requests
 import datetime
 import time
 
+import requests
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
@@ -36,20 +36,13 @@ async def btns_menu():
 '''
 @dp.message_handler()
 async def echo_message(msg: types.Message):
-
-    flag = False
-
+    mess = msg.text.lower()
     if '111' in msg.text:
         await bot.delete_message(msg.chat.id, msg.message_id)
-    elif 'соси' in msg.text:
+    elif 'соси' in mess:
         await bot.delete_message(msg.chat.id, msg.message_id)
         await bot.send_message(msg.chat.id, '\U0001F916 Сам соси!')
-        time.sleep(5)
-        await bot.delete_message(msg.chat.id, msg.message_id + 1)
-    elif 'Соси' in msg.text:
-        await bot.delete_message(msg.chat.id, msg.message_id)
-        await bot.send_message(msg.chat.id, '\U0001F916 Сам соси!')
-        time.sleep(5)
+        await time.sleep(5)
         await bot.delete_message(msg.chat.id, msg.message_id + 1)
     elif (msg.text == 'Привет, Чапля! \U0001F44B'):
         mark_menu = types.ReplyKeyboardMarkup(resize_keyboard=True)
