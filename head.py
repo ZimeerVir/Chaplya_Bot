@@ -6,7 +6,7 @@ def btns_menu():
     btn_weather = types.KeyboardButton('Погода \U00002600')
     btn_help = types.KeyboardButton('Помощь \U0001F4AC')
     btn_chep = types.KeyboardButton('Чепухи \U0001F921')
-    btn_ban = types.KeyboardButton('Погода \U0001F64A')
+    btn_ban = types.KeyboardButton('Запретка \U0001F64A')
     mark_menu.add(btn_weather)
     mark_menu.add(btn_chep)
     mark_menu.add(btn_help, btn_ban)

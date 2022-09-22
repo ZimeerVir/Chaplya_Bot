@@ -16,6 +16,7 @@ from head import btns_menu, btns_weather, btns_chep
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
+    write_msg(message)
     mark = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button = types.KeyboardButton('Привет, Чапля! \U0001F44B')
     mark.add(button)
@@ -24,6 +25,7 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['weather'])
 async def weather(msg: types.Message):
+    write_msg(msg)
     await bot.send_message(msg.chat.id, 'Введи, падла, свой гребанный город сюда:')
 
 
@@ -57,6 +59,7 @@ async def echo_message(msg: types.Message):
     else:
         await bot.send_message(msg.chat.id, '\U0001F916 Error: Ой! Давай не неси фигни!')
 
+    write_msg(msg)
 
 async def data_weather(city, msg):
     r = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric")
@@ -99,6 +102,18 @@ async def weather_now(data, msg):
           f'Восход: {datetime.datetime.fromtimestamp(data["sys"]["sunrise"]).strftime("%H:%M:%S")}\n'
           f'Закат: {datetime.datetime.fromtimestamp(data["sys"]["sunset"]).strftime("%H:%M:%S")}\n'
           f'Продолжительность светового дня: {sun}', reply_markup=mark_menu)
+
+
+def write_msg(msg):
+    file = open(f"./Messeges/Msg {msg.from_user.first_name}", "a")
+    file.write(f"{msg.date.date()}: {msg.from_user.first_name} ({msg.date.time()}) - {msg.text}\n")
+    file.close()
+
+
+# def write_msg(msg_bot):
+#     file = open(f"./Messeges/Msg {msg.from_user.first_name}", "a")
+#     file.write(f"{msg.date.date()}: {msg.from_user.first_name} ({msg.date.time()}) - {msg.text}\n")
+#     file.close()
 
 
 if __name__ == '__main__':
