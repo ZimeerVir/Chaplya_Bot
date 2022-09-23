@@ -1,17 +1,20 @@
 import datetime
 import time
+import random
 
 import requests
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 
+from glob import glob
+
 from config import TOKEN
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 from config import open_weather_token, cities, week, month, code_to_smile
-from head import btns_menu, btns_weather, btns_chep
+from handlers import btns_menu, btns_weather, btns_chep
 
 
 @dp.message_handler(commands=['start'])
@@ -22,11 +25,17 @@ async def process_start_command(message: types.Message):
     mark.add(button)
     await bot.send_message(message.chat.id, f'\U0001F916 Ииии... Камера, мотор, погнали!', reply_markup=mark)
 
+    msg_bot = f'\U0001F916 Ииии... Камера, мотор, погнали!'
+    write_msg_bot(message, msg_bot)
+
 
 @dp.message_handler(commands=['weather'])
 async def weather(msg: types.Message):
     write_msg(msg)
     await bot.send_message(msg.chat.id, 'Введи, падла, свой гребанный город сюда:')
+
+    msg_bot = 'Введи, падла, свой гребанный город сюда:'
+    write_msg_bot(msg, msg_bot)
 
 
 @dp.message_handler()
@@ -39,25 +48,38 @@ async def echo_message(msg: types.Message):
         await bot.send_message(msg.chat.id, '\U0001F916 Сам соси!')
         time.sleep(5)
         await bot.delete_message(msg.chat.id, msg.message_id + 1)
+        msg_bot = 'Сам...'
+        write_msg_bot(msg, msg_bot)
     elif (msg.text == 'Привет, Чапля! \U0001F44B'):
         mark_menu = btns_menu()
         await bot.send_message(msg.chat.id, f'Приветствую тебя, {msg.from_user.first_name}. \U0001F44B\n '
                                             f'Премного благодарен, что ты заглянул ко мне!)\n'
                                             f'Посмотри на кнопки.', reply_markup=mark_menu)
+        msg_bot = f'Приветствую тебя, {msg.from_user.first_name}. \U0001F44B ' \
+                  f'Премного благодарен, что ты заглянул ко мне!) ' \
+                  f'Посмотри на кнопки.'
+        write_msg_bot(msg, msg_bot)
     elif (msg.text == 'Погода \U00002600'):
         mark_weather = btns_weather()
         await bot.send_message(msg.chat.id, f'Выбери город, чтобы узрить!', reply_markup=mark_weather)
-
+        msg_bot = 'Выбери город, чтобы узрить!'
+        write_msg_bot(msg, msg_bot)
     elif 'Чепухи' in msg.text:
         mark_menu = btns_menu()
         mark_chep = btns_chep()
 
         await bot.send_message(msg.chat.id, 'Есть ссылочки для тебя!', reply_markup=mark_chep)
         await bot.send_message(msg.chat.id, 'Хорошего дня)', reply_markup=mark_menu)
+        msg_bot = f'Есть ссылочки для тебя! Хорошего дня)'
+        write_msg_bot(msg, msg_bot)
+    elif (msg. text == 'Мааася!) \U00002764'):
+        await images_Masya(msg)
     elif msg.text in cities:
         await data_weather(cities[msg.text], msg)
     else:
         await bot.send_message(msg.chat.id, '\U0001F916 Error: Ой! Давай не неси фигни!')
+        msg_bot = '\U0001F916 Error: Ой! Давай не неси фигни!'
+        write_msg_bot(msg, msg_bot)
 
     write_msg(msg)
 
@@ -68,7 +90,8 @@ async def data_weather(city, msg):
     await bot.send_message(msg.from_user.id, f'{r} \n')
     await date_now(data, msg)
     await weather_now(data, msg)
-
+    msg_bot = f'{r}'
+    write_msg_bot(msg, msg_bot)
 
 async def date_now(data, msg):
     tim = datetime.datetime.fromtimestamp(data['dt'])
@@ -78,6 +101,8 @@ async def date_now(data, msg):
 
     await bot.send_message(msg.from_user.id, data['name'])
     await bot.send_message(msg.from_user.id, f'{time}\n{day_week}\n{date}')
+    msg_bot = f'{data["name"]} {time} {day_week} {date}'
+    write_msg_bot(msg, msg_bot)
 
 
 async def weather_now(data, msg):
@@ -87,8 +112,12 @@ async def weather_now(data, msg):
     weather = data["weather"][0]["main"]
     if weather in code_to_smile:
         weather_smile = code_to_smile[weather]
+        msg_bot = f'{code_to_smile[weather]}\n'
+        write_msg_bot(msg, msg_bot)
     else:
         weather_smile = ("Посмотри в окно! А то чет не пойму, что там за погода!")
+        msg_bot = "Посмотри в окно! А то чет не пойму, что там за погода!"
+        write_msg_bot(msg, msg_bot)
 
     sun = datetime.datetime.fromtimestamp(data["sys"]["sunset"]) - datetime.datetime.fromtimestamp(
         data["sys"]["sunrise"])
@@ -103,6 +132,26 @@ async def weather_now(data, msg):
           f'Закат: {datetime.datetime.fromtimestamp(data["sys"]["sunset"]).strftime("%H:%M:%S")}\n'
           f'Продолжительность светового дня: {sun}', reply_markup=mark_menu)
 
+    msg_bot = f'Погода: {weather_smile}' \
+              f'Температура: {data["main"]["temp"]}°C' \
+              f'Температура сегодня: {data["main"]["temp_min"]} - {data["main"]["temp_max"]}°C' \
+              f'Ветер: {data["wind"]["speed"]} м/с' \
+              f'Влажность: {round(data["main"]["pressure"]/1.33, 2)} мм.рт.ст' \
+              f'Время дня:' \
+              f'Восход: {datetime.datetime.fromtimestamp(data["sys"]["sunrise"]).strftime("%H:%M:%S")}' \
+              f'Закат: {datetime.datetime.fromtimestamp(data["sys"]["sunset"]).strftime("%H:%M:%S")}' \
+              f'Продолжительность светового дня: {sun}'
+    write_msg_bot(msg, msg_bot)
+
+
+async def images_Masya(msg):
+    images = glob('./images/*')
+    img = random.choice(images)
+    await bot.send_photo(msg.chat.id, photo=open(img, 'rb'))
+
+    msg_bot = '*** Фото Марсена! ***'
+    write_msg_bot(msg, msg_bot)
+
 
 def write_msg(msg):
     file = open(f"./Messeges/Msg {msg.from_user.first_name}", "a")
@@ -110,10 +159,10 @@ def write_msg(msg):
     file.close()
 
 
-# def write_msg(msg_bot):
-#     file = open(f"./Messeges/Msg {msg.from_user.first_name}", "a")
-#     file.write(f"{msg.date.date()}: {msg.from_user.first_name} ({msg.date.time()}) - {msg.text}\n")
-#     file.close()
+def write_msg_bot(msg, msg_bot):
+    file = open(f"./Messeges/Msg {msg.from_user.first_name}", "a")
+    file.write(f"{msg.date.date()}: Chaplya_Bot ({msg.date.time()}) - {msg_bot}\n")
+    file.close()
 
 
 if __name__ == '__main__':

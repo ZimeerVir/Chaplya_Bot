@@ -7,8 +7,10 @@ def btns_menu():
     btn_help = types.KeyboardButton('Помощь \U0001F4AC')
     btn_chep = types.KeyboardButton('Чепухи \U0001F921')
     btn_ban = types.KeyboardButton('Запретка \U0001F64A')
+    btn_img = types.KeyboardButton('Мааася!) \U00002764')
     mark_menu.add(btn_weather)
     mark_menu.add(btn_chep)
+    mark_menu.add(btn_img)
     mark_menu.add(btn_help, btn_ban)
     return mark_menu
 
