@@ -40,6 +40,7 @@ async def weather(msg: types.Message):
 
 @dp.message_handler()
 async def echo_message(msg: types.Message):
+    write_msg(msg)
     mess = msg.text.lower()
     if '111' in msg.text:
         await bot.delete_message(msg.chat.id, msg.message_id)
@@ -81,7 +82,6 @@ async def echo_message(msg: types.Message):
         msg_bot = '\U0001F916 Error: Ой! Давай не неси фигни!'
         write_msg_bot(msg, msg_bot)
 
-    write_msg(msg)
 
 async def data_weather(city, msg):
     r = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric")
