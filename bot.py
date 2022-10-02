@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import time
 import random
@@ -50,7 +51,7 @@ async def echo_message(msg: types.Message):
     elif 'соси' in mess:
         await bot.delete_message(msg.chat.id, msg.message_id)
         await bot.send_message(msg.chat.id, '\U0001F916 Сам соси!')
-        time.sleep(5)
+        await asyncio.sleep(2)
         await bot.delete_message(msg.chat.id, msg.message_id + 1)
         msg_bot = 'Сам...'
         write_msg_bot(msg, msg_bot)
