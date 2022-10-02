@@ -16,6 +16,8 @@ dp = Dispatcher(bot)
 from config import open_weather_token, cities, week, month, code_to_smile
 from handlers import btns_menu, btns_weather, btns_chep
 
+# Строчка для проверки
+
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
