@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import time
 import random
+import re
 
 import requests
 from aiogram import Bot, types
@@ -16,6 +17,7 @@ dp = Dispatcher(bot)
 
 from config import open_weather_token, cities, week, month, code_to_smile
 from handlers import btns_menu, btns_weather, btns_chep
+from func_strings import anim
 
 
 @dp.message_handler(commands=['start'])
@@ -50,8 +52,8 @@ async def echo_message(msg: types.Message):
         await bot.delete_message(msg.chat.id, msg.message_id)
     elif 'соси' in mess:
         await bot.delete_message(msg.chat.id, msg.message_id)
-        await bot.send_message(msg.chat.id, '\U0001F916 Сам соси!')
-        await asyncio.sleep(2)
+        await bot.send_message(msg.chat.id, '\U0001F916 Сам !')
+        await asyncio.sleep(8)
         await bot.delete_message(msg.chat.id, msg.message_id + 1)
         msg_bot = 'Сам...'
         write_msg_bot(msg, msg_bot)
@@ -79,6 +81,8 @@ async def echo_message(msg: types.Message):
         write_msg_bot(msg, msg_bot)
     elif (msg. text == 'Мааася!) \U00002764'):
         await images_Masya(msg)
+    elif 'Поставь на' in msg.text:
+        await timer_10(msg)
     elif msg.text in cities:
         await data_weather(cities[msg.text], msg)
     else:
@@ -174,6 +178,30 @@ def write_msg_bot(msg, msg_bot):
     file.write(f"{msg.date.date()}: Chaplya_Bot ({msg.date.time()}) - {msg_bot}\n")
     file.close()
 
+
+async def timer_10(msg):
+    # (Разработака таймера)
+    x =  re.findall(r'\d+', msg.text)
+    m = int(x[0])
+    print(m)
+
+    n = 0
+    await bot.send_message(msg.from_user.id, m)
+    while(n <= m):
+        n += 1
+        if (n == m + 1):
+            await bot.send_message(msg.from_user.id, f'{m} SECONDS!')
+            break
+        
+        num_proc = (100 * n) / m
+        num_dict = int(num_proc / 5)
+        print(f'n = {n}; proc = {int(num_proc)}; dict = {num_dict}')
+        try:
+            await bot.edit_message_text(anim[num_dict], msg.from_user.id, msg.message_id + 1)
+        except:
+            await asyncio.sleep(1)
+            continue
+        await asyncio.sleep(1) 
 
 if __name__ == '__main__':
     # Я не понимаю (нужна хелп)
